@@ -43,6 +43,7 @@ ck_sample_enable_disable_command_fn(vlib_main_t* vm,
         return 0;
 }
 
+// 命令
 VLIB_CLI_COMMAND (ck_sample_command, static) = {
     .path = "pkt dump",
     .short_help = 
@@ -50,7 +51,7 @@ VLIB_CLI_COMMAND (ck_sample_command, static) = {
     .function = ck_sample_enable_disable_command_fn,
 };
 
-
+// 加入so的section
 VLIB_PLUGIN_REGISTER () = {
     .version = CK_SAMPLE_PLUGIN_BUILD_VER,
     .description = "Sample of VPP Plugin",
@@ -62,11 +63,13 @@ static clib_error_t *ck_sample_init(vlib_main_t* vm)
 	return 0;
 }
 
+// 加入 全局VM的function init list
 VLIB_INIT_FUNCTION(ck_sample_init);
 
+// 这个宏用于将你注册的节点 挂接（插入）到某个功能链
 VNET_FEATURE_INIT(ck_sample, static) = 
 {
-	.arc_name = "ip4-unicast",
+	.arc_name = "ip4-unicast", //功能链的名字，比如 "ip4-unicast"
 	.node_name = "ck_sample",
 	.runs_before = VNET_FEATURES("ip4-lookup"),
 };

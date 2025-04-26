@@ -170,8 +170,8 @@ srv6_localsid_sample_fn (vlib_main_t * vm, vlib_node_runtime_t * node, vlib_fram
   
   ip6_sr_main_t * sm = &sr_main;
 
-  from = vlib_frame_vector_args (frame);
-  n_left_from = frame->n_vectors;
+  from = vlib_frame_vector_args (frame);//获取 buffer index 的数组
+  n_left_from = frame->n_vectors; // 要处理的包数量
   next_index = node->cached_next_index;
   u32 thread_index = vlib_get_thread_index ();
 
@@ -179,6 +179,7 @@ srv6_localsid_sample_fn (vlib_main_t * vm, vlib_node_runtime_t * node, vlib_fram
   {
     u32 n_left_to_next;
 
+    // 获取下一个输出 frame 的 buffer to_next，用于指定每个包的下一跳。
     vlib_get_next_frame (vm, node, next_index,
 		   to_next, n_left_to_next);
 
@@ -193,16 +194,16 @@ srv6_localsid_sample_fn (vlib_main_t * vm, vlib_node_runtime_t * node, vlib_fram
       ip6_sr_localsid_t *ls0;
       srv6_localsid_sample_per_sid_memory_t *ls0_mem;
 
-      bi0 = from[0];
+      bi0 = from[0]; // 当前 buffer index
       to_next[0] = bi0;
       from += 1;
       to_next += 1;
       n_left_from -= 1;
       n_left_to_next -= 1;
 
-      b0 = vlib_get_buffer (vm, bi0);
-      ip0 = vlib_buffer_get_current (b0);
-      sr0 = (ip6_sr_header_t *)(ip0+1);
+      b0 = vlib_get_buffer (vm, bi0); //// 取出实际 buffer
+      ip0 = vlib_buffer_get_current (b0); // 获取 IPv6 header 起始位置
+      sr0 = (ip6_sr_header_t *)(ip0+1); // SRH 紧跟在 IPv6 后
 
       /* Lookup the SR End behavior based on IP DA (adj) */
       ls0 = pool_elt_at_index (sm->localsids, vnet_buffer(b0)->ip.adj_index[VLIB_TX]);
@@ -238,6 +239,7 @@ srv6_localsid_sample_fn (vlib_main_t * vm, vlib_node_runtime_t * node, vlib_fram
 
       pkts_swapped ++;
     }
+     // 塞完之后，把 frame 还给 VPP：
     vlib_put_next_frame (vm, node, next_index, n_left_to_next);
 
   }

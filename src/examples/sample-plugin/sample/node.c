@@ -114,6 +114,7 @@ VLIB_NODE_FN (sample_node) (vlib_main_t * vm, vlib_node_runtime_t * node,
 	  u32 bi0, bi1;
 	  vlib_buffer_t *b0, *b1;
 
+	  // 预取 和 
 	  /* Prefetch next iteration. */
 	  {
 	    vlib_buffer_t *p2, *p3;
@@ -124,6 +125,7 @@ VLIB_NODE_FN (sample_node) (vlib_main_t * vm, vlib_node_runtime_t * node,
 	    vlib_prefetch_buffer_header (p2, LOAD);
 	    vlib_prefetch_buffer_header (p3, LOAD);
 
+		// 我要写入这块数据，提前准备好 cache line
 	    CLIB_PREFETCH (p2->data, CLIB_CACHE_LINE_BYTES, STORE);
 	    CLIB_PREFETCH (p3->data, CLIB_CACHE_LINE_BYTES, STORE);
 	  }
@@ -270,6 +272,7 @@ VLIB_NODE_FN (sample_node) (vlib_main_t * vm, vlib_node_runtime_t * node,
 					   bi0, next0);
 	}
 
+		//函数设置frame状态等待vpp调度
       vlib_put_next_frame (vm, node, next_index, n_left_to_next);
     }
 

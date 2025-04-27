@@ -62,8 +62,10 @@ static uword ck_sample_node_fn(vlib_main_t *vm, vlib_node_runtime_t *node,
                 // 用来取你将要传给子节点的包数组信息
                 // 检查并确保有足够的空间来传递数据包给下一个节点
                 // 这里的 next_index 是你要传递给下一个节点的索引
-                // 这里的 to_next 是下一个节点的缓冲区索引数组指针 返回值
-                // n_left_to_next 是下一个节点缓冲区中剩余的可用空间 返回值
+                // 这里的 to_next 是下一个节点的缓冲区索引数组指针 
+                // n_left_to_next 是下一个节点缓冲区中剩余的可用空间 
+                // n_left_to_next 是当前帧中剩余的空闲槽位数量,当值为0后，
+                //需要vlib_put_next_frame获取一个新的帧来继续传递数据包
                 vlib_get_next_frame(vm, node, next_index, to_next, n_left_to_next);
 
                 while(n_left_from > 0 && n_left_to_next > 0){

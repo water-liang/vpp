@@ -149,6 +149,7 @@ load_one_plugin (plugin_main_t * pm, plugin_info_t * pi, int from_early_init)
 
   pi->handle = handle;
 
+  // 获取vlib_plugin_registration对应的变量
   reg = dlsym (pi->handle, "vlib_plugin_registration");
 
   if (reg == 0)
@@ -163,6 +164,7 @@ load_one_plugin (plugin_main_t * pm, plugin_info_t * pi, int from_early_init)
   pi->version = str_array_to_vec ((char *) &reg->version,
 				  sizeof (reg->version));
 
+          // 执行 early_init函数
   if (reg->early_init)
     {
       clib_error_t *(*ei) (vlib_main_t *);

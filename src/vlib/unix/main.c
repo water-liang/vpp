@@ -604,6 +604,7 @@ thread0 (uword arg)
   int i;
 
   unformat_init_command_line (&input, (char **) vm->argv);
+  // 执行plugin的init function
   i = vlib_main (vm, &input);
   unformat_free (&input);
 
@@ -650,6 +651,7 @@ vlib_unix_main (int argc, char *argv[])
     }
   unformat_free (&input);
 
+  //加载plugin
   i = vlib_plugin_early_init (vm);
   if (i)
     return i;
@@ -673,6 +675,7 @@ vlib_unix_main (int argc, char *argv[])
   __os_thread_index = 0;
   vm->thread_index = 0;
 
+  // 启动协程
   i = clib_calljmp (thread0, (uword) vm,
 		    (void *) (vlib_thread_stacks[0] +
 			      VLIB_THREAD_STACK_SIZE));

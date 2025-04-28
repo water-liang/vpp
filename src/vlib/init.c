@@ -54,11 +54,11 @@ vlib_call_init_exit_functions (vlib_main_t * vm,
 	{
 	  if (call_once)
 	    hash_set1 (vm->init_functions_called, i->f);
-	  error = i->f (vm);
+	  error = i->f (vm);//调用init函数
 	  if (error)
 	    return error;
 	}
-      i = i->next_init_function;
+      i = i->next_init_function; //下一个init函数
     }
   return error;
 }

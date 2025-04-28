@@ -1296,6 +1296,7 @@ dispatch_process (vlib_main_t * vm,
   old_process_index = nm->current_process_index;
   nm->current_process_index = node->runtime_index;
 
+  // 处理node function
   n_vectors = vlib_process_startup (vm, p, f);
 
   nm->current_process_index = old_process_index;
@@ -1472,6 +1473,7 @@ vlib_main_or_worker_loop (vlib_main_t * vm, int is_main)
     nm->interrupt_threshold_vector_length = 5;
 
   /* Start all processes. */
+  // 启动所有的协程
   if (is_main)
     {
       uword i;
@@ -1481,6 +1483,7 @@ vlib_main_or_worker_loop (vlib_main_t * vm, int is_main)
 					 cpu_time_now);
     }
 
+    // 循环
   while (1)
     {
       vlib_node_runtime_t *n;
@@ -1496,6 +1499,7 @@ vlib_main_or_worker_loop (vlib_main_t * vm, int is_main)
 	}
 
       /* Process pre-input nodes. */
+      // 处理pre-inpput节点
       vec_foreach (n, nm->nodes_by_type[VLIB_NODE_TYPE_PRE_INPUT])
 	cpu_time_now = dispatch_node (vm, n,
 				      VLIB_NODE_TYPE_PRE_INPUT,
@@ -1504,6 +1508,7 @@ vlib_main_or_worker_loop (vlib_main_t * vm, int is_main)
 				      cpu_time_now);
 
       /* Next process input nodes. */
+      // 处理input节点
       vec_foreach (n, nm->nodes_by_type[VLIB_NODE_TYPE_INPUT])
 	cpu_time_now = dispatch_node (vm, n,
 				      VLIB_NODE_TYPE_INPUT,
@@ -1519,6 +1524,7 @@ vlib_main_or_worker_loop (vlib_main_t * vm, int is_main)
 	/* unlocked read, for performance */
 	uword l = _vec_len (nm->pending_interrupt_node_runtime_indices);
 	uword i;
+  // PREDICT_FALSE 是一个 分支预测优化宏，它的作用是告诉编译器「这个条件大概率是假的」
 	if (PREDICT_FALSE (l > 0))
 	  {
 	    u32 *tmp;
@@ -1729,6 +1735,7 @@ vlib_main (vlib_main_t * volatile vm, unformat_input_t * input)
       goto done;
     }
 
+    // 注册node，加入到process runtime中
   /* Register static nodes so that init functions may use them. */
   vlib_register_all_static_nodes (vm);
 
@@ -1770,6 +1777,7 @@ vlib_main (vlib_main_t * volatile vm, unformat_input_t * input)
   /* See unix/main.c; most likely already set up */
   if (vm->init_functions_called == 0)
     vm->init_functions_called = hash_create (0, /* value bytes */ 0);
+    // 执行 plugin的init function
   if ((error = vlib_call_all_init_functions (vm)))
     goto done;
 

@@ -652,6 +652,7 @@ vlib_unix_main (int argc, char *argv[])
   unformat_free (&input);
 
   //加载plugin
+  // 执行early_init
   i = vlib_plugin_early_init (vm);
   if (i)
     return i;
@@ -659,6 +660,8 @@ vlib_unix_main (int argc, char *argv[])
   unformat_init_command_line (&input, (char **) vm->argv);
   if (vm->init_functions_called == 0)
     vm->init_functions_called = hash_create (0, /* value bytes */ 0);
+
+    //config函数初始化
   e = vlib_call_all_config_functions (vm, &input, 1 /* early */ );
   if (e != 0)
     {

@@ -1814,6 +1814,7 @@ vlib_main (vlib_main_t * volatile vm, unformat_input_t * input)
       goto done;
     }
 
+    // call config functions
   if ((error = vlib_call_all_config_functions (vm, input, 0 /* is_early */ )))
     goto done;
 

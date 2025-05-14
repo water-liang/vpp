@@ -138,6 +138,7 @@ load_one_plugin (plugin_main_t * pm, plugin_info_t * pi, int from_early_init)
   vec_free (data);
   elf_main_free (&em);
 
+  // 读取动态库
   handle = dlopen ((char *) pi->filename, RTLD_LAZY);
 
   if (handle == 0)
@@ -323,6 +324,7 @@ vlib_load_new_plugins (plugin_main_t * pm, int from_early_init)
     {
       pi = vec_elt_at_index (pm->plugin_info, i);
 
+      // load 插件
       if (load_one_plugin (pm, pi, from_early_init))
 	{
 	  /* Make a note of any which fail to load */
